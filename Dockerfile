@@ -10,9 +10,6 @@ RUN npm run build
 FROM nginx:alpine
 WORKDIR /app
 
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
@@ -22,17 +19,27 @@ COPY --from=builder /app/public /app/public
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/package.json /app/package.json
 
-# Set correct permissions
-RUN chown -R appuser:appgroup /app && \
+# Set permissions for user 10001
+RUN chown -R 10001:0 /app && \
     chmod -R 755 /app && \
-    chown -R appuser:appgroup /var/cache/nginx && \
-    chown -R appuser:appgroup /var/log/nginx && \
-    chown -R appuser:appgroup /etc/nginx/conf.d && \
+    chown -R 10001:0 /var/cache/nginx && \
+    chown -R 10001:0 /var/log/nginx && \
+    chown -R 10001:0 /etc/nginx/conf.d && \
     touch /var/run/nginx.pid && \
-    chown -R appuser:appgroup /var/run/nginx.pid
+    chown -R 10001:0 /var/run/nginx.pid && \
+    # Fix common nginx permission issues
+    chmod -R 755 /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
+    # Create nginx temp directories and set permissions
+    mkdir -p /var/cache/nginx/client_temp && \
+    mkdir -p /var/cache/nginx/proxy_temp && \
+    mkdir -p /var/cache/nginx/fastcgi_temp && \
+    mkdir -p /var/cache/nginx/uwsgi_temp && \
+    mkdir -p /var/cache/nginx/scgi_temp && \
+    chown -R 10001:0 /var/cache/nginx && \
+    chmod -R 755 /var/cache/nginx
 
-# Switch to non-root user
-USER appuser
+# Switch to user 10001
+USER 10001
 
 # Expose port 8080 (Choreo requirement)
 EXPOSE 8080
