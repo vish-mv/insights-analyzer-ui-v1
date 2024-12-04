@@ -19,3 +19,126 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* Add after the existing styles */
+.logo-holder {
+  background: transparent;
+  width: 180px;
+  height: 220px;
+  position: relative;
+  margin: 0;  /* Changed from margin: 0 auto */
+  padding-top: 12px;
+  padding-bottom: 24px;
+  transform: translateZ(0);
+  scale: 0.7;
+}
+
+.bar {
+  position: relative;
+  height: 6px;
+  background: none;
+  width: 0%;
+  margin-top: 8px;
+  box-shadow: 0 0 3px rgba(192,192,192,0.9);
+  animation: fill 5s infinite alternate, colors 5s infinite alternate;
+}
+
+.bar.fill1 { animation: fill-1 5s infinite alternate, colors 5s infinite alternate; }
+.bar.fill2 { animation: fill-2 5s infinite alternate, colors 5s infinite alternate; }
+.bar.fill3 { animation: fill-3 5s infinite alternate, colors 5s infinite alternate; }
+.bar.fill4 { animation: fill-4 5s infinite alternate, colors 5s infinite alternate; }
+.bar.fill5 { animation: fill-5 5s infinite alternate, colors 5s infinite alternate; }
+.bar.fill6 { animation: fill-6 5s infinite alternate, colors 5s infinite alternate; }
+
+@keyframes fill {
+  0%   { width: 0; }
+  25%  { width: 145px;}
+  50%  { width: 30px;}
+  75%  { width: 180px;}
+  100% { width: 250px; }
+}
+
+@keyframes fill-1 {
+  0%   { width: 0; }
+  25%  { width: 110px;}
+  50%  { width: 40px;}
+  75%  { width: 190px;}
+  100% { width: 270px; }
+}
+
+@keyframes fill-2 {
+  0%   { width: 0; }
+  25%  { width: 160px;}
+  50%  { width: 80px;}
+  75%  { width: 240px;}
+  100% { width: 265px; }
+}
+
+@keyframes fill-3 {
+  0%   { width: 0; }
+  25%  { width: 90px;}
+  50%  { width: 170px;}
+  75%  { width: 260px;}
+  100% { width: 149px; }
+}
+
+@keyframes fill-4 {
+  0%   { width: 0; }
+  25%  { width: 128px;}
+  50%  { width: 54px;}
+  75%  { width: 160px;}
+  100% { width: 199px; }
+}
+
+@keyframes fill-5 {
+  0%   { width: 0; }
+  25%  { width: 150px;}
+  50%  { width: 20px;}
+  75%  { width: 120px;}
+  100% { width: 178px; }
+}
+
+@keyframes fill-6 {
+  0%   { width: 0; }
+  25%  { width: 98px;}
+  50%  { width: 132px;}
+  75%  { width: 270px;}
+  100% { width: 190px; }
+}
+
+@keyframes fill-7 {
+  0%   { width: 0; }
+  25%  { width: 175px;}
+  50%  { width: 45px;}
+  75%  { width: 210px;}
+  100% { width: 165px; }
+}
+
+@keyframes fill-8 {
+  0%   { width: 0; }
+  25%  { width: 85px;}
+  50%  { width: 195px;}
+  75%  { width: 40px;}
+  100% { width: 230px; }
+}
+
+@keyframes fill-9 {
+  0%   { width: 0; }
+  25%  { width: 155px;}
+  50%  { width: 270px;}
+  75%  { width: 185px;}
+  100% { width: 140px; }
+}
+
+@keyframes fill-10 {
+  0%   { width: 0; }
+  25%  { width: 120px;}
+  50%  { width: 170px;}
+  75%  { width: 265px;}
+  100% { width: 205px; }
+}
+
+@keyframes colors {
+  0% { background-color: #5a5a5a;}
+  50% { background-color: #6495ED;}
+  100% { background-color: #7280f7;}
+}
