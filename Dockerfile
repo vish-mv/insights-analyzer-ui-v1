@@ -19,24 +19,51 @@ COPY --from=builder /app/public /app/public
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/package.json /app/package.json
 
-# Set permissions for user 10001
-RUN chown -R 10001:0 /app && \
+# Create required directories with correct permissions
+RUN mkdir -p /tmp/nginx/cache && \
+    mkdir -p /tmp/nginx/run && \
+    # Set permissions for user 10001
+    chown -R 10001:0 /app && \
     chmod -R 755 /app && \
     chown -R 10001:0 /var/cache/nginx && \
     chown -R 10001:0 /var/log/nginx && \
     chown -R 10001:0 /etc/nginx/conf.d && \
-    touch /var/run/nginx.pid && \
-    chown -R 10001:0 /var/run/nginx.pid && \
+    chown -R 10001:0 /tmp/nginx && \
     # Fix common nginx permission issues
-    chmod -R 755 /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /etc/nginx/conf.d /tmp/nginx && \
     # Create nginx temp directories and set permissions
-    mkdir -p /var/cache/nginx/client_temp && \
-    mkdir -p /var/cache/nginx/proxy_temp && \
-    mkdir -p /var/cache/nginx/fastcgi_temp && \
-    mkdir -p /var/cache/nginx/uwsgi_temp && \
-    mkdir -p /var/cache/nginx/scgi_temp && \
-    chown -R 10001:0 /var/cache/nginx && \
-    chmod -R 755 /var/cache/nginx
+    mkdir -p /tmp/nginx/client_temp && \
+    mkdir -p /tmp/nginx/proxy_temp && \
+    mkdir -p /tmp/nginx/fastcgi_temp && \
+    mkdir -p /tmp/nginx/uwsgi_temp && \
+    mkdir -p /tmp/nginx/scgi_temp && \
+    chown -R 10001:0 /tmp/nginx && \
+    chmod -R 755 /tmp/nginx
+
+# Copy modified nginx.conf that uses /tmp for pid and other files
+COPY <<EOF /etc/nginx/nginx.conf
+pid /tmp/nginx/nginx.pid;
+worker_processes auto;
+error_log /dev/stdout info;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    access_log    /dev/stdout;
+
+    client_body_temp_path /tmp/nginx/client_temp;
+    proxy_temp_path       /tmp/nginx/proxy_temp;
+    fastcgi_temp_path    /tmp/nginx/fastcgi_temp;
+    uwsgi_temp_path      /tmp/nginx/uwsgi_temp;
+    scgi_temp_path       /tmp/nginx/scgi_temp;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
 
 # Switch to user 10001
 USER 10001
@@ -44,5 +71,5 @@ USER 10001
 # Expose port 8080 (Choreo requirement)
 EXPOSE 8080
 
-# Start nginx
+# Start nginx with custom config
 CMD ["nginx", "-g", "daemon off;"]
