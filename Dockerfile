@@ -19,44 +19,41 @@ COPY --from=builder /app/public /app/public
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/package.json /app/package.json
 
-# Copy modified nginx.conf that uses /tmp for pid and other files
-COPY <<EOF /etc/nginx/nginx.conf
-pid /tmp/nginx.pid;
-worker_processes auto;
-error_log /dev/stdout info;
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-    access_log    /dev/stdout;
-
-    client_body_temp_path /tmp/client_temp;
-    proxy_temp_path       /tmp/proxy_temp;
-    fastcgi_temp_path    /tmp/fastcgi_temp;
-    uwsgi_temp_path      /tmp/uwsgi_temp;
-    scgi_temp_path       /tmp/scgi_temp;
-
-    include /etc/nginx/conf.d/*.conf;
-}
-EOF
-
 # Create startup script
-COPY <<EOF /docker-entrypoint.sh
-#!/bin/sh
+RUN echo $'#!/bin/sh\n\
 mkdir -p /tmp/client_temp \
          /tmp/proxy_temp \
          /tmp/fastcgi_temp \
          /tmp/uwsgi_temp \
-         /tmp/scgi_temp
-chmod 755 /tmp/*_temp
-exec nginx -g 'daemon off;'
-EOF
+         /tmp/scgi_temp \
+         /tmp/nginx\n\
+chmod 755 /tmp/*_temp /tmp/nginx\n\
+nginx -g "daemon off;"' > /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
 
-RUN chmod +x /docker-entrypoint.sh
+# Copy modified nginx.conf
+RUN echo $'\
+pid /tmp/nginx/nginx.pid;\n\
+worker_processes auto;\n\
+error_log /dev/stdout info;\n\
+\n\
+events {\n\
+    worker_connections 1024;\n\
+}\n\
+\n\
+http {\n\
+    include       /etc/nginx/mime.types;\n\
+    default_type  application/octet-stream;\n\
+    access_log    /dev/stdout;\n\
+\n\
+    client_body_temp_path /tmp/client_temp;\n\
+    proxy_temp_path       /tmp/proxy_temp;\n\
+    fastcgi_temp_path    /tmp/fastcgi_temp;\n\
+    uwsgi_temp_path      /tmp/uwsgi_temp;\n\
+    scgi_temp_path       /tmp/scgi_temp;\n\
+\n\
+    include /etc/nginx/conf.d/*.conf;\n\
+}' > /etc/nginx/nginx.conf
 
 # Switch to user 10001
 USER 10001
