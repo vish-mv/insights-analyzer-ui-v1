@@ -54,7 +54,7 @@ const ChatInterface = () => {
     setLoadingMessage('Analyzing data...');
 
     try {
-      const response = await fetch('https://88f055eb-bb85-4ad2-a5f8-b2578a2c6e07-dev.e1-eu-north-azure.choreoapis.dev/insights-analyzer/insights-analyzer-v1/v1.0/chat', {
+      const response = await fetch('https://88f055eb-bb85-4ad2-a5f8-b2578a2c6e07-dev.e1-eu-north-azure.choreoapis.dev/insights-analyzer/insights-backend-test/v1.0/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
